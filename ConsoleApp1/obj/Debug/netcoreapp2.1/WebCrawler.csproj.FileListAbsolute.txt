@@ -1,0 +1,10 @@
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\bin\Debug\netcoreapp2.1\WebCrawler.deps.json
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\bin\Debug\netcoreapp2.1\WebCrawler.runtimeconfig.json
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\bin\Debug\netcoreapp2.1\WebCrawler.runtimeconfig.dev.json
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\bin\Debug\netcoreapp2.1\WebCrawler.dll
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\bin\Debug\netcoreapp2.1\WebCrawler.pdb
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\obj\Debug\netcoreapp2.1\WebCrawler.csproj.CoreCompileInputs.cache
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\obj\Debug\netcoreapp2.1\WebCrawler.AssemblyInfoInputs.cache
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\obj\Debug\netcoreapp2.1\WebCrawler.AssemblyInfo.cs
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\obj\Debug\netcoreapp2.1\WebCrawler.dll
+C:\Users\ChubutIT\WebCrawler\WebCrawler\ConsoleApp1\obj\Debug\netcoreapp2.1\WebCrawler.pdb
