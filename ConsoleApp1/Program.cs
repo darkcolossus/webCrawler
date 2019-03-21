@@ -18,7 +18,7 @@ namespace WebCrawler
     {
         public static async Task Main(string[] args)
         {
-            Crawler webCrawler = new Crawler("https://es.wikipedia.org/wiki/");
+            Crawler webCrawler = new Crawler("https://es.wikipedia.org/wiki/", 20);
             await webCrawler.Start();
             Console.ReadKey();
         }
@@ -27,6 +27,8 @@ namespace WebCrawler
     //Summary: Class Crawler models
     class Crawler
     {
+        private string seed;
+        private int webPagesAmountToCrawl = 0;
         private readonly object locking_webPagesVisited = new object();
         private int webPagesVisited = 0;
         private readonly object locking_webPages = new object();
@@ -34,8 +36,10 @@ namespace WebCrawler
         private readonly object locking_wordCounter = new object();
         private Dictionary<string, int> wordCounter;
 
-        public Crawler(string webpage) {
+        public Crawler(string webpage, int amountToCrawl) {
+            seed = webpage;
             webpages = new List<string> { webpage };
+            webPagesAmountToCrawl = amountToCrawl;
             wordCounter = new Dictionary<string, int>();
         }
 
@@ -51,12 +55,34 @@ namespace WebCrawler
                 //Distict keywords by key and count, and then order by count.
                 wordCounter = wordCounter.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 
+                //Save wordcounter in a file
+                using (System.IO.StreamWriter file =
+                 new System.IO.StreamWriter(@"WebCrawler.txt"))
+                {
+                    file.WriteLine("Word  \t\t\t   | Occurrences");
+                    foreach (var line in wordCounter)
+                    {
+                        file.WriteLine(line.Key + " \t\t\t\t " + wordCounter[line.Key]);
+                    }
+                }
+
                 //print Top 50 keyword to console.
-                Console.WriteLine("Word  \t\t\t   | No. of Occurrences");
+                Console.WriteLine("================================================================================");
+                Console.WriteLine("|| Top 50 words. If you want to see the full wordcounter, open WebCrawler.txt ||");
+                Console.WriteLine("================================================================================");
+
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("================================================================================");
+                Console.WriteLine("|| Word  \t\t\t   | No. of Occurrences  \t\t\t||");
+                Console.WriteLine("================================================================================");
+
                 foreach (var aux in wordCounter.Take(50))
                 {
                     Console.WriteLine("{0}  \t\t\t\t    {1}", aux.Key, wordCounter[aux.Key]);
                 }
+
+               
             }
             catch (HttpRequestException e)
             {
@@ -69,7 +95,7 @@ namespace WebCrawler
         public async Task Crawl(string currentWebPage) {
 
             //when webPages max amount is reached, crawl ends
-            if (webPagesVisited == 50)
+            if (webPagesVisited == webPagesAmountToCrawl)
             {
                 return;
             }
@@ -91,7 +117,7 @@ namespace WebCrawler
             htmlDocument.DocumentNode.Descendants().Where(n => n.Name == "script" || n.Name == "style" || n.Name == "noscript" || n.Name == "--").ToList().ForEach(n => n.Remove());
 
             //Get links
-            var links = htmlDocument.DocumentNode.SelectNodes("//p//a[@href]").ToList();//.Attributes["href"].Value;
+            var links = htmlDocument.DocumentNode.SelectNodes("//p//a[@href]").ToList();
             string currentLink = "";
             bool flag = true;
 
@@ -102,9 +128,9 @@ namespace WebCrawler
                 {
                     currentLink = links[i].Attributes["href"].Value;
 
-                    if (!webpages.Contains(currentLink))
+                    if (!webpages.Contains(seed + currentLink))
                     {
-                        webpages.Add("https://es.wikipedia.org" + currentLink);
+                        webpages.Add(seed + currentLink);
                         flag = false;
                     }
                 }
