@@ -68,7 +68,8 @@ namespace WebCrawler
 
                 //print Top 50 keyword to console.
                 Console.WriteLine("================================================================================");
-                Console.WriteLine("|| Top 50 words. If you want to see the full wordcounter, open WebCrawler.txt ||");
+                Console.WriteLine("|| Top 50 words. If you want to see the full wordcounter, open                ||");
+                Console.WriteLine("|| ConsoleApp1/bin/Debug/netcoreapp2.1/WebCrawler.txtWebCrawler.txt           ||");
                 Console.WriteLine("================================================================================");
 
                 Console.WriteLine();
