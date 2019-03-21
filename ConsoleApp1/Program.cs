@@ -3,8 +3,10 @@
  * Date: 20/03/2019
 */
 
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -27,6 +29,7 @@ namespace WebCrawler
     {
         object locking_webPagesVisited = new object();
         private int webPagesVisited = 0;
+        object locking_webPages = new object();
         private List<string> webpages;
         private Dictionary<string, int> wordCounter;
 
@@ -52,8 +55,31 @@ namespace WebCrawler
             //Request WebPage
             HttpClient client = new HttpClient();
             Console.WriteLine("Requesting the webpage {0}", currentWebPage);
+            var html = await client.GetStringAsync(currentWebPage);
 
+            //Parse Html: Only words from non-internal parts of the page must be processed (no inside of <script> etc).
+            HtmlDocument htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(html);
+            htmlDocument.DocumentNode.Descendants().Where(n => n.Name == "script" || n.Name == "style" || n.Name == "noscript" || n.Name == "--").ToList().ForEach(n => n.Remove());
 
+            var links = htmlDocument.DocumentNode.SelectNodes("//p//a[@href]").ToList();//.Attributes["href"].Value;
+            string currentLink = "";
+            bool flag = true;
+
+            //Check link in webpages list
+            for (int i = 0; i < links.Count && flag; i++)
+            {
+                currentLink = links[i].Attributes["href"].Value;
+
+                if (!webpages.Contains(currentLink))
+                {
+                    webpages.Add("https://es.wikipedia.org" + currentLink);
+                    flag = false;
+                }
+            }
+
+            return;
+            
         }
     }
 
