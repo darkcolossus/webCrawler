@@ -11,11 +11,11 @@ namespace WebCrawler
 {
     class Program
     {
-        public static async Task Main(string[] args)
+        public static void  Main(string[] args)
         {
             Console.WriteLine("Hello World!");
             Crawler webCrawler = new Crawler("https://es.wikipedia.org/wiki/");
-            await webCrawler.Start();
+            webCrawler.Start();
             Console.ReadKey();
         }
     }
@@ -32,8 +32,9 @@ namespace WebCrawler
             wordCounter = new Dictionary<string, int>();
         }
 
-        public async Task Start() {
-
+        public void Start()
+        {
+            return;
         }
     }
 
