@@ -28,10 +28,11 @@ namespace WebCrawler
     //Summary: Class Crawler models
     class Crawler
     {
-        object locking_webPagesVisited = new object();
+        private readonly object locking_webPagesVisited = new object();
         private int webPagesVisited = 0;
-        object locking_webPages = new object();
+        private readonly object locking_webPages = new object();
         private List<string> webpages;
+        private readonly object locking_wordCounter = new object();
         private Dictionary<string, int> wordCounter;
 
         public Crawler(string webpage) {
@@ -41,14 +42,14 @@ namespace WebCrawler
 
         public async Task Start()
         {
-            await crawl(webpages[0]);
+            await Crawl(webpages[0]);
         }
 
         //Summary: crawl method into currentWebPage
-        public async Task crawl(string currentWebPage) {
+        public async Task Crawl(string currentWebPage) {
 
             //when webPages max amount is reached, crawl ends
-            if (webPagesVisited == 5)
+            if (webPagesVisited == 10)
             {
                 return;
             }
@@ -69,31 +70,56 @@ namespace WebCrawler
             htmlDocument.LoadHtml(html);
             htmlDocument.DocumentNode.Descendants().Where(n => n.Name == "script" || n.Name == "style" || n.Name == "noscript" || n.Name == "--").ToList().ForEach(n => n.Remove());
 
+            //Get links
             var links = htmlDocument.DocumentNode.SelectNodes("//p//a[@href]").ToList();//.Attributes["href"].Value;
             string currentLink = "";
             bool flag = true;
 
             //Check link in webpages list
-            for (int i = 0; i < links.Count && flag; i++)
+            lock (locking_webPages)
             {
-                currentLink = links[i].Attributes["href"].Value;
-
-                if (!webpages.Contains(currentLink))
+                for (int i = 0; i < links.Count && flag; i++)
                 {
-                    webpages.Add("https://es.wikipedia.org" + currentLink);
-                    flag = false;
+                    currentLink = links[i].Attributes["href"].Value;
+
+                    if (!webpages.Contains(currentLink))
+                    {
+                        webpages.Add("https://es.wikipedia.org" + currentLink);
+                        flag = false;
+                    }
                 }
             }
+             
 
             //Parallel tasks crawling webpages
             List<Task> tasks = new List<Task>
                 {
-                    Task.Run(() =>crawl("https://es.wikipedia.org" + currentLink))
+                    Task.Run(() =>Crawl("https://es.wikipedia.org" + currentLink))
                 };
 
-            Task.WaitAll(tasks.ToArray());
 
-            
+            //Split words
+            string myString = Regex.Replace(htmlDocument.DocumentNode.InnerText, @"\s+", " ").Replace("&nbsp;", "");
+            String[] result = myString.Split();
+
+
+            //Add words to wordCounter
+            lock (locking_wordCounter)
+            {
+                foreach (var word in result)
+                {
+                    if (!wordCounter.ContainsKey(word))
+                    {
+                        wordCounter[word] = 1;
+                    }
+                    else
+                    {
+                        wordCounter[word] += 1;
+                    }
+                }
+            }
+
+            Task.WaitAll(tasks.ToArray());
         }
     }
 
