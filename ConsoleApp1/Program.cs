@@ -18,7 +18,6 @@ namespace WebCrawler
     {
         public static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
             Crawler webCrawler = new Crawler("https://es.wikipedia.org/wiki/");
             await webCrawler.Start();
             Console.ReadKey();
@@ -43,13 +42,34 @@ namespace WebCrawler
         public async Task Start()
         {
             await Crawl(webpages[0]);
+            try
+            {
+                Console.WriteLine();
+                Console.WriteLine("En total se visitaron: {0} pagina(s)", webPagesVisited);
+                Console.WriteLine();
+
+                //Distict keywords by key and count, and then order by count.
+                wordCounter = wordCounter.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+
+                //print Top 50 keyword to console.
+                Console.WriteLine("Word  \t\t\t   | No. of Occurrences");
+                foreach (var aux in wordCounter.Take(50))
+                {
+                    Console.WriteLine("{0}  \t\t\t\t    {1}", aux.Key, wordCounter[aux.Key]);
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+            }
         }
 
         //Summary: crawl method into currentWebPage
         public async Task Crawl(string currentWebPage) {
 
             //when webPages max amount is reached, crawl ends
-            if (webPagesVisited == 10)
+            if (webPagesVisited == 50)
             {
                 return;
             }
