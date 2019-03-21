@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WebCrawler
@@ -46,6 +47,12 @@ namespace WebCrawler
         //Summary: crawl method into currentWebPage
         public async Task crawl(string currentWebPage) {
 
+            //when webPages max amount is reached, crawl ends
+            if (webPagesVisited == 5)
+            {
+                return;
+            }
+
             //webPagesVisited needs to be blocked beacuse it is a shared resource
             lock (locking_webPagesVisited)
             {
@@ -78,7 +85,14 @@ namespace WebCrawler
                 }
             }
 
-            return;
+            //Parallel tasks crawling webpages
+            List<Task> tasks = new List<Task>
+                {
+                    Task.Run(() =>crawl("https://es.wikipedia.org" + currentLink))
+                };
+
+            Task.WaitAll(tasks.ToArray());
+
             
         }
     }
